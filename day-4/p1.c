@@ -3,45 +3,38 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-long long fact(int n) {
-    long long f = 1;
-    for (int i = 2; i <= n; i++) f *= i;
-    return f;
+int fact(int n){int f=1;for(int i=2;i<=n;i++)f*=i;return f;}
+
+int main(){
+    int n=7,sum=0;
+    for(int i=1;i<=n;i++){
+        pid_t pid=fork();
+        if(pid==0){
+            long long f=fact(i);
+            printf("Child PID:%d PPID:%d\n",getpid(),getppid());
+            exit(f);
+        }
+    }
+    for(int i=1;i<=n;i++){
+        int st;pid_t cp=wait(&st);
+        sum+=WEXITSTATUS(st);
+        printf("Parent got %d from child %d\n",WEXITSTATUS(st),cp);
+        if (i==n)
+            printf("%d!= %lld\n",i,WEXITSTATUS(st));
+    }
+    printf("Sum =%d\n",sum);
 }
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) return 1;
-    int num = atoi(argv[1]);
 
-    pid_t p1 = fork();
-
-    if (p1 == 0) {
-        printf("[P1] PID: %d, PPID: %d, Child: None\n", getpid(), getppid());
-        printf("%d! = %lld\n\n", num, fact(num));
-        exit(0);
-    }
-
-    pid_t p2 = fork();
-
-    if (p2 == 0) {
-        long long sum = 0;
-        for (int i = 1; i <= num; i++) sum += fact(i);
-        printf("[P2] PID: %d, PPID: %d, Child: None\n", getpid(), getppid());
-        printf("Sum = %lld\n\n", sum);
-        exit(0);
-    }
-
-    wait(NULL);
-    wait(NULL);
-    printf("[Parent] PID: %d, Children: %d, %d\n", getpid(), p1, p2);
-    return 0;
-}
-
-// Example usage: ./p1 5
-// [P1] PID: 25765, PPID: 25764, Child: None
-// 5! = 120
-
-// [P2] PID: 25766, PPID: 25764, Child: None
+// Child PID:13681 PPID:13680
+// Child PID:13682 PPID:13680
+// Child PID:13683 PPID:13680
+// Child PID:13684 PPID:13680
+// Child PID:13685 PPID:13680
+// Parent got 1 from child 13681
+// Parent got 2 from child 13682
+// Parent got 6 from child 13683
+// Parent got 24 from child 13684
+// Parent got 120 from child 13685
+// 5!= 120
 // Sum = 153
-
-// [Parent] PID: 25764, Children: 25765, 25766

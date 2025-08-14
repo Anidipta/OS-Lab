@@ -36,3 +36,12 @@ int main(int argc, char *argv[]) {
     printf("[Parent] PID: %d, Children: %d, %d\n", getpid(), p1, p2);
     return 0;
 }
+
+// Example usage: ./p1 5
+// [P1] PID: 25765, PPID: 25764, Child: None
+// 5! = 120
+
+// [P2] PID: 25766, PPID: 25764, Child: None
+// Sum = 153
+
+// [Parent] PID: 25764, Children: 25765, 25766
